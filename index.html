@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analisis Saringan — KAKUKA 2026</title>
+<style>
+  :root {
+    --primary:#1a3a5c; --secondary:#2e6da4; --accent:#e8f0fa;
+    --gold:#c8a415; --border:#9ab8d8; --text:#1a1a2e;
+    --bg:#f0f5fb; --white:#fff; --alt:#f5f9ff;
+    --success:#2e7d32; --warning:#e65100;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+  /* ── TOP BAR ── */
+  .topbar{background:var(--primary);color:#fff;padding:0 24px;display:flex;align-items:center;
+          justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;
+          border-bottom:3px solid var(--gold);box-shadow:0 2px 8px #0004}
+  .topbar h1{font-size:1rem;font-weight:700;letter-spacing:.5px}
+  .topbar .dev{font-size:.75rem;opacity:.7;margin-top:2px}
+  .topbar .badge{background:var(--gold);color:#fff;font-size:.7rem;font-weight:700;
+                 padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+
+  /* ── LAYOUT ── */
+  .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+  .banner{background:linear-gradient(135deg,var(--primary),var(--secondary));
+          color:#fff;border-radius:10px;padding:20px 28px;margin-bottom:24px;
+          border-left:5px solid var(--gold)}
+  .banner h2{font-size:1.25rem;margin-bottom:4px}
+  .banner p{font-size:.85rem;opacity:.8}
+
+  /* ── SECTIONS ── */
+  .section{background:var(--white);border-radius:10px;margin-bottom:20px;
+           box-shadow:0 2px 8px #0001;overflow:hidden;border:1px solid #d8e8f5}
+  .sec-hdr{background:var(--primary);color:#fff;padding:10px 18px;
+           font-size:.9rem;font-weight:700;letter-spacing:.3px;
+           border-bottom:2px solid var(--gold);display:flex;align-items:center;gap:8px}
+  .sec-hdr .num{background:var(--gold);color:#fff;width:24px;height:24px;border-radius:50%;
+                display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+  .sec-body{padding:18px}
+
+  /* ── GRID FORM ── */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+  @media(max-width:640px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+  .field{display:flex;flex-direction:column;gap:4px}
+  label{font-size:.78rem;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px}
+  input[type=text],input[type=number],select,textarea{
+    border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.88rem;
+    width:100%;transition:border .2s,box-shadow .2s;background:var(--white);color:var(--text)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--secondary);
+    box-shadow:0 0 0 3px #2e6da418}
+  textarea{resize:vertical;min-height:80px}
+  select{cursor:pointer}
+
+  /* ── TABLES ── */
+  .tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  thead th{background:var(--primary);color:#fff;padding:8px 6px;text-align:center;
+           font-weight:700;font-size:.78rem;white-space:nowrap}
+  tbody tr:nth-child(even){background:var(--alt)}
+  tbody tr:hover{background:var(--accent)}
+  td{padding:5px 6px;border-bottom:1px solid #dde8f5;vertical-align:middle}
+  td.num{text-align:center;font-weight:600;color:var(--secondary)}
+  td input{border:1px solid #c0d4ea;border-radius:4px;padding:4px 6px;
+           font-size:.8rem;width:100%;min-width:60px}
+  td select{border:1px solid #c0d4ea;border-radius:4px;padding:4px 6px;font-size:.8rem;width:100%}
+  td.computed{background:#eaf2fb;text-align:center;color:var(--secondary);font-weight:600;font-size:.8rem}
+
+  /* ── BUTTONS ── */
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;
+           position:sticky;bottom:0;background:var(--white);padding:14px 18px;
+           border-top:2px solid var(--border);z-index:90}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border:none;
+       border-radius:7px;font-size:.88rem;font-weight:700;cursor:pointer;
+       transition:all .18s;letter-spacing:.3px}
+  .btn-reset{background:var(--alt);color:var(--primary);border:2px solid var(--border)}
+  .btn-reset:hover{background:#dce8f5}
+  .btn-pdf{background:var(--primary);color:#fff;border:2px solid var(--gold);
+           box-shadow:0 3px 10px #1a3a5c33}
+  .btn-pdf:hover{background:var(--secondary);transform:translateY(-1px);box-shadow:0 5px 14px #1a3a5c44}
+  .btn-pdf:active{transform:translateY(0)}
+
+  /* ── FOOTER ── */
+  footer{text-align:center;padding:20px;font-size:.78rem;color:#888;margin-top:10px}
+  footer strong{color:var(--primary)}
+
+  /* ── LOADING ── */
+  .overlay{display:none;position:fixed;inset:0;background:#0006;z-index:999;
+            align-items:center;justify-content:center}
+  .overlay.show{display:flex}
+  .spinner-box{background:#fff;border-radius:12px;padding:28px 40px;text-align:center;
+               box-shadow:0 8px 30px #0004}
+  .spinner{width:44px;height:44px;border:4px solid var(--accent);
+           border-top-color:var(--primary);border-radius:50%;
+           animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;top:70px;right:20px;background:var(--primary);color:#fff;
+         padding:12px 20px;border-radius:8px;font-size:.85rem;z-index:9999;
+         border-left:4px solid var(--gold);display:none;box-shadow:0 4px 14px #0003}
+  .toast.show{display:block;animation:fadeIn .3s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+  .info-tag{display:inline-block;background:var(--accent);color:var(--secondary);
+            font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:600;margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="h1" style="font-size:1rem;font-weight:700">🔬 Analisis Saringan / Sieve Analysis</div>
+    <div class="dev">Sistem Pendataan Praktikum Mekanika Tanah</div>
+  </div>
+  <div class="badge">KAKUKA 2026 · Toro-Praba</div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="spinner-box">
+    <div class="spinner"></div>
+    <div style="font-weight:700;color:var(--primary)">Membuat PDF…</div>
+    <div style="font-size:.8rem;color:#888;margin-top:4px">Mohon tunggu sebentar</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <div class="banner">
+    <h2>📋 Lembar Pendataan Praktikum Analisis Saringan</h2>
+    <p>Isi seluruh data lapangan / laboratorium, kemudian klik <b>Cetak PDF</b> untuk menghasilkan laporan.</p>
+  </div>
+
+  <form id="mainForm">
+
+    <!-- ════════════════════ 1. IDENTITAS ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">1</span> IDENTITAS PRAKTIKUM</div>
+      <div class="sec-body">
+        <div class="grid2">
+          <div class="field"><label>Nama Praktikan</label><input type="text" name="nama_praktikan" placeholder="Masukkan nama lengkap"/></div>
+          <div class="field"><label>Kelompok / Kelas</label><input type="text" name="kelompok_kelas" placeholder="Contoh: Kelompok 3 / TL-2A"/></div>
+          <div class="field"><label>Asisten / Dosen</label><input type="text" name="asisten_dosen" placeholder="Nama asisten atau dosen"/></div>
+          <div class="field"><label>Tanggal Uji</label><input type="text" name="tanggal_uji" placeholder="dd/mm/yyyy"/></div>
+          <div class="field"><label>Lokasi Pengambilan Sampel</label><input type="text" name="lokasi" placeholder="Lokasi lapangan"/></div>
+          <div class="field"><label>Cuaca / Kondisi Lokasi</label><input type="text" name="cuaca" placeholder="Contoh: Cerah, kering"/></div>
+          <div class="field"><label>Kode Sampel</label><input type="text" name="kode_sampel" placeholder="Contoh: S-01"/></div>
+          <div class="field"><label>Titik / Bor / STA</label><input type="text" name="titik_bor" placeholder="Contoh: BH-1 / STA 0+100"/></div>
+          <div class="field"><label>Kedalaman Sampel</label><input type="text" name="kedalaman" placeholder="Contoh: 0,5 – 1,0 m"/></div>
+          <div class="field"><label>Jenis Sampel</label>
+            <select name="jenis_sampel">
+              <option value="">— Pilih —</option>
+              <option>Disturbed</option><option>Undisturbed</option>
+            </select>
+          </div>
+          <div class="field"><label>Metode Pengeringan</label>
+            <select name="metode_pengeringan">
+              <option value="">— Pilih —</option>
+              <option>Oven</option><option>Angin-angin</option>
+            </select>
+          </div>
+          <div class="field"><label>Kondisi Sampel</label>
+            <select name="kondisi_sampel">
+              <option value="">— Pilih —</option>
+              <option>Basah</option><option>Kering</option><option>Lembap</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 2. CHECKLIST ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">2</span> CHECKLIST PERALATAN DAN BAHAN</div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th style="width:40px">No.</th><th>Peralatan / Bahan</th>
+              <th style="width:130px">Kondisi</th>
+              <th style="width:80px">Jumlah</th>
+              <th>Catatan</th>
+            </tr></thead>
+            <tbody id="tbPeralatan">
+              {% set alat_list = [
+                "Satu set saringan standar","Pan dan tutup saringan","Timbangan digital",
+                "Oven pengering","Kuas pembersih saringan","Shaker/alat penggetar saringan",
+                "Cawan/wadah sampel","Tanah sampel kering","Label sampel dan alat tulis"
+              ] %}
+              {% for a in alat_list %}
+              <tr>
+                <td class="num">{{loop.index}}</td>
+                <td>{{a}}</td>
+                <td><select name="peralatan_{{loop.index0}}_kondisi">
+                  <option value="">—</option>
+                  <option value="Baik ✓">Baik ✓</option>
+                  <option value="Rusak ✗">Rusak ✗</option>
+                </select></td>
+                <td><input type="text" name="peralatan_{{loop.index0}}_jumlah" placeholder="—"/></td>
+                <td><input type="text" name="peralatan_{{loop.index0}}_catatan" placeholder="Catatan opsional"/></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 3. DATA AWAL ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">3</span> DATA AWAL SAMPEL</div>
+      <div class="sec-body">
+        <div class="grid3">
+          <div class="field"><label>Wc — Berat wadah kosong (g)</label><input type="number" step="0.01" name="wc" placeholder="0.00"/></div>
+          <div class="field"><label>Wc+w — Berat wadah + tanah basah (g)</label><input type="number" step="0.01" name="wcw" placeholder="0.00"/></div>
+          <div class="field"><label>Ww — Berat tanah basah (g) <span class="info-tag">auto</span></label><input type="number" step="0.01" name="ww" placeholder="Wc+w − Wc" id="fWw" readonly style="background:#eaf2fb"/></div>
+          <div class="field"><label>Wc+d — Berat wadah + tanah kering (g)</label><input type="number" step="0.01" name="wcd" placeholder="0.00"/></div>
+          <div class="field"><label>Wd — Berat tanah kering total (g)</label><input type="number" step="0.01" name="wd" placeholder="0.00" id="fWd"/></div>
+          <div class="field"><label>Wtotal — Berat utk analisis saringan (g)</label><input type="number" step="0.01" name="wtotal" placeholder="0.00" id="fWtotal"/></div>
+          <div class="field"><label>w — Kadar air awal (%) <span class="info-tag">auto</span></label><input type="number" step="0.01" name="kadar_air" placeholder="(Ww−Wd)/Wd×100%" id="fKadarAir" readonly style="background:#eaf2fb"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 5. TABEL UTAMA ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">5</span> TABEL DATA UTAMA ANALISIS SARINGAN</div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table id="tblSaringan">
+            <thead><tr>
+              <th>No.</th><th>Nomor Saringan</th><th>Ukuran (mm)</th>
+              <th>Berat Saringan Kosong (g)</th><th>Berat Saringan + Tanah (g)</th>
+              <th>Berat Tertahan Wi (g)</th>
+              <th>% Tertahan</th><th>% Tertahan Kumulatif</th><th>% Lolos</th>
+              <th>Keterangan</th>
+            </tr></thead>
+            <tbody>
+              {% for s in sieve_data %}
+              <tr data-idx="{{loop.index0}}">
+                <td class="num">{{s.no}}</td>
+                <td class="num">{{s.nomor}}</td>
+                <td class="num">{{s.ukuran}}</td>
+                <td><input type="number" step="0.01" name="sv_{{loop.index0}}_bsk" class="inp-bsk" placeholder="0.00"/></td>
+                <td><input type="number" step="0.01" name="sv_{{loop.index0}}_bst" class="inp-bst" placeholder="0.00"/></td>
+                <td><input type="number" step="0.01" name="sv_{{loop.index0}}_bt" class="inp-bt" placeholder="0.00" id="wi_{{loop.index0}}"/></td>
+                <td class="computed" id="pct_{{loop.index0}}">—</td>
+                <td class="computed" id="cum_{{loop.index0}}">—</td>
+                <td class="computed" id="los_{{loop.index0}}">—</td>
+                <td><input type="text" name="sv_{{loop.index0}}_ket" placeholder="Catatan"/></td>
+              </tr>
+              {% endfor %}
+              <tr style="background:#d0e4f7">
+                <td colspan="5" style="text-align:right;font-weight:700;padding-right:8px">TOTAL ΣWi</td>
+                <td class="num" id="totalWi" style="font-weight:700;color:var(--primary)">0.00</td>
+                <td class="num" style="font-weight:700">100%</td>
+                <td colspan="3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:.78rem;color:#666;margin-top:8px">
+          💡 Isi <b>Berat Tertahan Wi</b> — kolom % tertahan, kumulatif &amp; lolos dihitung otomatis.
+          Atau isi Berat Saringan Kosong + Berat Saringan+Tanah untuk auto-hitung Wi.
+        </p>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 7. REKAP FRAKSI ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">7</span> REKAP FRAKSI TANAH</div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Fraksi Tanah</th><th>Batas Umum</th>
+              <th>Rumus</th><th>Persentase (%)</th><th>Keterangan</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><b>Kerikil / Gravel</b></td>
+                <td class="num">> 4,75 mm</td>
+                <td>Tertahan kumulatif pada No. 4</td>
+                <td><input type="text" name="fraksi_kerikil" placeholder="%"/></td>
+                <td><input type="text" name="fraksi_ket_kerikil" placeholder="Catatan"/></td>
+              </tr>
+              <tr>
+                <td><b>Pasir / Sand</b></td>
+                <td class="num">4,75 – 0,075 mm</td>
+                <td>% lolos No.4 − % lolos No.200</td>
+                <td><input type="text" name="fraksi_pasir" placeholder="%"/></td>
+                <td><input type="text" name="fraksi_ket_pasir" placeholder="Catatan"/></td>
+              </tr>
+              <tr>
+                <td><b>Lanau + Lempung / Fines</b></td>
+                <td class="num">< 0,075 mm</td>
+                <td>% lolos No. 200</td>
+                <td><input type="text" name="fraksi_lanau" placeholder="%"/></td>
+                <td><input type="text" name="fraksi_ket_lanau" placeholder="Catatan"/></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 8. DATA GRAFIK ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">8</span> DATA GRAFIK DISTRIBUSI UKURAN BUTIRAN</div>
+      <div class="sec-body">
+        <div class="grid4">
+          <div class="field"><label>D10 (mm) — 10% lolos</label><input type="text" name="d10" placeholder="0.000"/></div>
+          <div class="field"><label>D30 (mm) — 30% lolos</label><input type="text" name="d30" placeholder="0.000"/></div>
+          <div class="field"><label>D50 (mm) — 50% lolos</label><input type="text" name="d50" placeholder="0.000"/></div>
+          <div class="field"><label>D60 (mm) — 60% lolos</label><input type="text" name="d60" placeholder="0.000"/></div>
+          <div class="field"><label>Cu = D60/D10 <span class="info-tag">auto</span></label><input type="text" name="cu" id="fCu" readonly placeholder="—" style="background:#eaf2fb"/></div>
+          <div class="field"><label>Cc = D30²/(D10×D60) <span class="info-tag">auto</span></label><input type="text" name="cc" id="fCc" readonly placeholder="—" style="background:#eaf2fb"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 9. KLASIFIKASI ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">9</span> KLASIFIKASI DAN KESIMPULAN SEMENTARA</div>
+      <div class="sec-body">
+        <div class="grid2">
+          <div class="field"><label>Jenis Tanah Dominan</label><input type="text" name="jenis_tanah" placeholder="Contoh: Pasir berlempung"/></div>
+          <div class="field"><label>Persentase Lolos No. 200 (%)</label><input type="text" name="lolos_no200" placeholder="%"/></div>
+          <div class="field"><label>Gradasi Tanah</label>
+            <select name="gradasi">
+              <option value="">— Pilih —</option>
+              <option>Well graded</option><option>Poorly graded</option>
+              <option>Uniform</option><option>Gap graded</option>
+            </select>
+          </div>
+          <div class="field"><label>Klasifikasi Awal USCS/AASHTO</label><input type="text" name="klasifikasi" placeholder="Contoh: SP, SM, GW"/></div>
+          <div class="field" style="grid-column:1/-1"><label>Keterangan Visual Tanah</label>
+            <textarea name="keterangan_visual" placeholder="Warna, bau, bentuk butir, plastisitas, kandungan organik, dll."></textarea>
+          </div>
+          <div class="field" style="grid-column:1/-1"><label>Catatan Khusus Saat Pengujian</label>
+            <textarea name="catatan_khusus" placeholder="Kendala atau hal khusus selama pengujian"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 10. CATATAN ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">10</span> CATATAN PENGAMATAN</div>
+      <div class="sec-body">
+        <textarea name="catatan_pengamatan" placeholder="Tulis catatan pengamatan di sini…" style="min-height:100px"></textarea>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 11. VALIDASI ════════════════════ -->
+    <div class="section">
+      <div class="sec-hdr"><span class="num">11</span> VALIDASI DATA</div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Praktikan</th><th>Asisten / Dosen</th><th>Tanggal Pemeriksaan</th>
+            </tr></thead>
+            <tbody>
+              {% for i in range(3) %}
+              <tr>
+                <td><input type="text" name="val_{{i}}_praktikan" placeholder="Nama praktikan"/></td>
+                <td><input type="text" name="val_{{i}}_asisten" placeholder="Nama asisten/dosen"/></td>
+                <td><input type="text" name="val_{{i}}_tanggal" placeholder="dd/mm/yyyy"/></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ BUTTONS ════════════════════ -->
+    <div class="btn-row">
+      <button type="button" class="btn btn-reset" onclick="resetForm()">🔄 Reset Form</button>
+      <button type="button" class="btn btn-pdf" onclick="cetakPDF()">📥 Cetak PDF</button>
+    </div>
+
+  </form>
+</div>
+
+<footer>
+  © 2026 <strong>KAKUKA</strong> — Developer: <strong>Toro-Praba</strong> &nbsp;|&nbsp;
+  Sistem Pendataan Praktikum Analisis Saringan
+</footer>
+
+<script>
+// ── AUTO-CALC HELPERS ──────────────────────────────────────────────────────
+function num(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+function numN(n){ return parseFloat(document.querySelector(`[name="${n}"]`)?.value)||0; }
+
+function calcDataAwal(){
+  const wc=numN('wc'), wcw=numN('wcw'), wd=numN('wd');
+  const ww = wcw - wc;
+  const fWw=document.getElementById('fWw');
+  const fKa=document.getElementById('fKadarAir');
+  if(fWw) fWw.value = wcw>0&&wc>0 ? ww.toFixed(2) : '';
+  if(fKa) fKa.value = wd>0&&ww>0 ? ((ww-wd)/wd*100).toFixed(2) : '';
+}
+
+// auto-calc Wi from Bsk & Bst
+function calcWiFromBskt(idx){
+  const bsk = parseFloat(document.querySelector(`[name="sv_${idx}_bsk"]`)?.value)||0;
+  const bst = parseFloat(document.querySelector(`[name="sv_${idx}_bst"]`)?.value)||0;
+  if(bsk>0 && bst>0){
+    const wi = document.getElementById(`wi_${idx}`);
+    if(wi && !wi._manual) wi.value = Math.max(0,bst-bsk).toFixed(2);
+  }
+  calcSaringan();
+}
+
+function calcSaringan(){
+  const wtotal = numN('wtotal');
+  let cum=0, totalWi=0;
+  for(let i=0;i<15;i++){
+    const wi = parseFloat(document.getElementById(`wi_${i}`)?.value)||0;
+    totalWi+=wi;
+    const pct = wtotal>0 ? wi/wtotal*100 : 0;
+    cum+=pct;
+    const lolos = Math.max(0,100-cum);
+    document.getElementById(`pct_${i}`).textContent = wtotal>0 ? pct.toFixed(2)+'%' : '—';
+    document.getElementById(`cum_${i}`).textContent = wtotal>0 ? cum.toFixed(2)+'%' : '—';
+    document.getElementById(`los_${i}`).textContent = wtotal>0 ? lolos.toFixed(2)+'%' : '—';
+  }
+  document.getElementById('totalWi').textContent = totalWi.toFixed(2);
+}
+
+function calcCuCc(){
+  const d10=parseFloat(document.querySelector('[name="d10"]')?.value)||0;
+  const d30=parseFloat(document.querySelector('[name="d30"]')?.value)||0;
+  const d60=parseFloat(document.querySelector('[name="d60"]')?.value)||0;
+  document.getElementById('fCu').value = d10>0&&d60>0 ? (d60/d10).toFixed(3) : '';
+  document.getElementById('fCc').value = d10>0&&d30>0&&d60>0 ? (d30*d30/(d10*d60)).toFixed(3) : '';
+}
+
+// ── EVENT LISTENERS ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{
+  ['wc','wcw','wd'].forEach(n=>{
+    document.querySelector(`[name="${n}"]`)?.addEventListener('input', calcDataAwal);
+  });
+  document.querySelector('[name="wtotal"]')?.addEventListener('input', calcSaringan);
+
+  for(let i=0;i<15;i++){
+    document.querySelector(`[name="sv_${i}_bsk"]`)?.addEventListener('input',()=>calcWiFromBskt(i));
+    document.querySelector(`[name="sv_${i}_bst"]`)?.addEventListener('input',()=>calcWiFromBskt(i));
+    const wi=document.getElementById(`wi_${i}`);
+    if(wi){
+      wi.addEventListener('input',()=>{ wi._manual=true; calcSaringan(); });
+    }
+  }
+  ['d10','d30','d60'].forEach(n=>{
+    document.querySelector(`[name="${n}"]`)?.addEventListener('input', calcCuCc);
+  });
+});
+
+// ── COLLECT DATA ─────────────────────────────────────────────────────────────
+function collectData(){
+  const fd = new FormData(document.getElementById('mainForm'));
+  const get = n => fd.get(n)||'';
+
+  const peralatan = Array.from({length:9},(_,i)=>({
+    kondisi: get(`peralatan_${i}_kondisi`),
+    jumlah:  get(`peralatan_${i}_jumlah`),
+    catatan: get(`peralatan_${i}_catatan`),
+  }));
+
+  const saringan = Array.from({length:15},(_,i)=>({
+    berat_saringan_kosong: get(`sv_${i}_bsk`),
+    berat_saringan_tanah:  get(`sv_${i}_bst`),
+    berat_tertahan:        get(`sv_${i}_bt`)||document.getElementById(`wi_${i}`)?.value||'',
+    keterangan:            get(`sv_${i}_ket`),
+  }));
+
+  const validasi = Array.from({length:3},(_,i)=>({
+    praktikan: get(`val_${i}_praktikan`),
+    asisten:   get(`val_${i}_asisten`),
+    tanggal:   get(`val_${i}_tanggal`),
+  }));
+
+  return {
+    identitas:{
+      nama_praktikan:    get('nama_praktikan'),
+      kelompok_kelas:    get('kelompok_kelas'),
+      asisten_dosen:     get('asisten_dosen'),
+      tanggal_uji:       get('tanggal_uji'),
+      lokasi:            get('lokasi'),
+      cuaca:             get('cuaca'),
+      kode_sampel:       get('kode_sampel'),
+      titik_bor:         get('titik_bor'),
+      kedalaman:         get('kedalaman'),
+      jenis_sampel:      get('jenis_sampel'),
+      metode_pengeringan:get('metode_pengeringan'),
+      kondisi_sampel:    get('kondisi_sampel'),
+    },
+    peralatan,
+    data_awal:{
+      wc:         get('wc'),
+      wcw:        get('wcw'),
+      ww:         document.getElementById('fWw')?.value||'',
+      wcd:        get('wcd'),
+      wd:         get('wd'),
+      wtotal:     get('wtotal'),
+      kadar_air:  document.getElementById('fKadarAir')?.value||'',
+    },
+    saringan,
+    fraksi:{
+      kerikil:    get('fraksi_kerikil'),
+      ket_kerikil:get('fraksi_ket_kerikil'),
+      pasir:      get('fraksi_pasir'),
+      ket_pasir:  get('fraksi_ket_pasir'),
+      lanau:      get('fraksi_lanau'),
+      ket_lanau:  get('fraksi_ket_lanau'),
+    },
+    grafik:{
+      d10: get('d10'), d30: get('d30'), d50: get('d50'), d60: get('d60'),
+      cu:  document.getElementById('fCu')?.value||'',
+      cc:  document.getElementById('fCc')?.value||'',
+    },
+    kesimpulan:{
+      jenis_tanah:      get('jenis_tanah'),
+      lolos_no200:      get('lolos_no200'),
+      gradasi:          get('gradasi'),
+      klasifikasi:      get('klasifikasi'),
+      keterangan_visual:get('keterangan_visual'),
+      catatan_khusus:   get('catatan_khusus'),
+    },
+    catatan_pengamatan: get('catatan_pengamatan'),
+    validasi,
+  };
+}
+
+// ── CETAK PDF ─────────────────────────────────────────────────────────────────
+async function cetakPDF(){
+  const data = collectData();
+  document.getElementById('overlay').classList.add('show');
+  try{
+    const res = await fetch('/cetak_pdf',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data),
+    });
+    if(!res.ok) throw new Error('Server error');
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    const ts   = new Date().toISOString().slice(0,10);
+    const nama = (data.identitas.nama_praktikan||'sampel').replace(/\s+/g,'_');
+    a.download = `analisis_saringan_${nama}_${ts}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ PDF berhasil diunduh!');
+  } catch(e){
+    showToast('❌ Gagal membuat PDF: '+e.message);
+  } finally{
+    document.getElementById('overlay').classList.remove('show');
+  }
+}
+
+function resetForm(){
+  if(!confirm('Reset semua data? Tindakan ini tidak dapat dibatalkan.')) return;
+  document.getElementById('mainForm').reset();
+  for(let i=0;i<15;i++){
+    ['pct','cum','los'].forEach(p=>{ document.getElementById(`${p}_${i}`).textContent='—'; });
+    const wi=document.getElementById(`wi_${i}`); if(wi) wi._manual=false;
+  }
+  document.getElementById('totalWi').textContent='0.00';
+  document.getElementById('fWw').value='';
+  document.getElementById('fKadarAir').value='';
+  document.getElementById('fCu').value='';
+  document.getElementById('fCc').value='';
+  showToast('🔄 Form berhasil direset');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
